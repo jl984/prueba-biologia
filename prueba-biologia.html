@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prueba Interactiva — 02/06</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 16px;
+    color: #333;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+  }
+  header {
+    background: linear-gradient(135deg, #1a4d8f, #2e75b6);
+    color: #fff;
+    padding: 24px 20px;
+    text-align: center;
+  }
+  header h1 { font-size: 22px; margin-bottom: 4px; }
+  header p { font-size: 14px; opacity: 0.9; }
+
+  .screen { padding: 24px 20px; display: none; }
+  .screen.active { display: block; }
+
+  /* PANTALLA INICIO */
+  #inicio .intro {
+    background: #f5f7fb;
+    border-left: 4px solid #2e75b6;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .input-group { margin: 20px 0; }
+  .input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .input-group input:focus { border-color: #2e75b6; }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s;
+  }
+  button:active { transform: scale(0.98); }
+  .btn-primary {
+    background: linear-gradient(135deg, #2e75b6, #1a4d8f);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(46, 117, 182, 0.3);
+  }
+  .btn-whatsapp {
+    background: #25D366;
+    color: #fff;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+  }
+  .btn-secondary {
+    background: #f0f0f0;
+    color: #555;
+    margin-top: 10px;
+  }
+
+  /* PANTALLA PRUEBA */
+  .progreso {
+    background: #e9ecef;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .progreso-barra {
+    background: linear-gradient(90deg, #2e75b6, #25D366);
+    height: 100%;
+    transition: width 0.3s;
+  }
+  .contador {
+    text-align: center;
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .pregunta {
+    font-size: 17px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .opciones { display: flex; flex-direction: column; gap: 10px; }
+  .opcion {
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1.4;
+    transition: all 0.2s;
+    background: #fff;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .opcion:hover { border-color: #2e75b6; background: #f5f9fd; }
+  .opcion.seleccionada {
+    border-color: #2e75b6;
+    background: #e3f0fb;
+    font-weight: 500;
+  }
+  .opcion .letra {
+    background: #ddd;
+    color: #555;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .opcion.seleccionada .letra { background: #2e75b6; color: #fff; }
+
+  .navegacion {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .navegacion button { flex: 1; }
+
+  /* PANTALLA RESULTADO */
+  #resultado { text-align: center; }
+  .puntaje-circulo {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  .puntaje-numero { font-size: 48px; font-weight: 700; line-height: 1; }
+  .puntaje-total { font-size: 18px; opacity: 0.9; margin-top: 4px; }
+  .nivel {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 16px 0 8px;
+  }
+  .mensaje {
+    color: #666;
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+  .revisar-btn {
+    background: transparent;
+    color: #2e75b6;
+    border: 2px solid #2e75b6;
+  }
+  .desglose {
+    text-align: left;
+    margin-top: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 16px;
+    display: none;
+  }
+  .desglose.visible { display: block; }
+  .desglose h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: #1a4d8f;
+  }
+  .item-revision {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .item-revision:last-child { border-bottom: none; }
+  .item-revision .num { font-weight: 600; }
+  .correcta { color: #25D366; font-weight: 600; }
+  .incorrecta { color: #e74c3c; font-weight: 600; }
+  .explicacion {
+    margin-top: 6px;
+    color: #555;
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    padding: 14px;
+    color: #aaa;
+    font-size: 12px;
+    background: #f8f9fa;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>📚 Prueba Interactiva</h1>
+    <p>Salud, Estrés, Sueño, Salud Mental y Drogas — 02/06</p>
+  </header>
+
+  <!-- PANTALLA 1: INICIO -->
+  <div class="screen active" id="inicio">
+    <h2 style="color:#1a4d8f; margin-bottom:8px;">¡Bienvenido/a!</h2>
+    <div class="intro">
+      <strong>📝 20 preguntas</strong> de selección múltiple<br>
+      <strong>⏱ Tiempo sugerido:</strong> 25 minutos<br>
+      <strong>📊 Al terminar</strong> verás tu puntaje y resultados<br>
+      <strong>🎯 Temas:</strong> Metabolismo, Contaminación, Salud, Estrés, Sueño, Salud Mental y Drogas
+    </div>
+
+    <div class="input-group">
+      <label for="nombre">Tu nombre:</label>
+      <input type="text" id="nombre" placeholder="Escribe tu nombre" maxlength="40">
+    </div>
+
+    <button class="btn-primary" onclick="iniciar()">🚀 Comenzar prueba</button>
+    <button class="btn-whatsapp" onclick="compartirPrueba()">📲 Compartir prueba por WhatsApp</button>
+  </div>
+
+  <!-- PANTALLA 2: PRUEBA -->
+  <div class="screen" id="prueba">
+    <div class="progreso"><div class="progreso-barra" id="barra"></div></div>
+    <div class="contador" id="contador">Pregunta 1 de 20</div>
+    <div class="pregunta" id="enunciado"></div>
+    <div class="opciones" id="opciones"></div>
+    <div class="navegacion">
+      <button class="btn-secondary" id="btn-anterior" onclick="anterior()">← Anterior</button>
+      <button class="btn-primary" id="btn-siguiente" onclick="siguiente()">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- PANTALLA 3: RESULTADO -->
+  <div class="screen" id="resultado">
+    <h2 style="color:#1a4d8f;">¡Prueba terminada!</h2>
+    <p style="color:#777; margin-top:6px;" id="nombre-resultado"></p>
+
+    <div class="puntaje-circulo" id="circulo-puntaje">
+      <div class="puntaje-numero" id="puntaje-num">0</div>
+      <div class="puntaje-total">de 20</div>
+    </div>
+
+    <div class="nivel" id="nivel-texto"></div>
+    <div class="mensaje" id="mensaje-resultado"></div>
+
+    <button class="btn-whatsapp" onclick="compartirResultado()">📲 Compartir resultado por WhatsApp</button>
+    <button class="revisar-btn" onclick="toggleRevision()" style="margin-top:10px;">📖 Ver/ocultar revisión</button>
+    <button class="btn-secondary" onclick="reiniciar()">🔄 Volver a intentar</button>
+
+    <div class="desglose" id="desglose">
+      <h3>Revisión por pregunta:</h3>
+      <div id="revision-detalle"></div>
+    </div>
+  </div>
+
+  <footer>Hecho con ❤ para estudiar mejor</footer>
+</div>
+
+<script>
+// ============ BANCO DE PREGUNTAS ============
+const preguntas = [
+  // ----- MEZCLA: algunas del PDF anterior + nuevas sobre el temario -----
+  {
+    pregunta: "¿Cuál es la diferencia principal entre anabolismo y catabolismo?",
+    opciones: [
+      "Anabolismo libera energía y catabolismo la consume",
+      "Anabolismo construye moléculas y consume energía; catabolismo degrada y libera energía",
+      "Ambos liberan energía pero en diferente cantidad",
+      "Solo el anabolismo ocurre en las células",
+      "No hay diferencia, son sinónimos"
+    ],
+    correcta: 1,
+    explicacion: "Anabolismo = construye + consume energía (ej. síntesis de proteínas). Catabolismo = degrada + libera energía (ej. respiración celular)."
+  },
+  {
+    pregunta: "¿Cuántas kilocalorías por gramo aportan los lípidos?",
+    opciones: ["4 kcal", "5 kcal", "7 kcal", "9 kcal", "12 kcal"],
+    correcta: 3,
+    explicacion: "Los lípidos aportan 9 kcal/g, más del doble que carbohidratos y proteínas (4 kcal/g cada uno)."
+  },
+  {
+    pregunta: "Los episodios de contaminación atmosférica en Santiago durante el invierno se deben principalmente a:",
+    opciones: [
+      "Erupciones volcánicas",
+      "Calefacción a leña e inversión térmica",
+      "Tráfico marítimo",
+      "Lluvia ácida",
+      "Radiación solar excesiva"
+    ],
+    correcta: 1,
+    explicacion: "El uso de leña + la inversión térmica (capa de aire frío que atrapa los contaminantes) son las causas principales del MP2,5 en Santiago en invierno."
+  },
+  {
+    pregunta: "Quintero-Puchuncaví es conocida como \"zona de sacrificio\" por:",
+    opciones: [
+      "Contaminación lumínica nocturna",
+      "Emisiones industriales y intoxicaciones masivas",
+      "Contaminación acústica del aeropuerto",
+      "Derrames de petróleo en sus playas únicamente",
+      "Vertederos de basura ilegal"
+    ],
+    correcta: 1,
+    explicacion: "Quintero-Puchuncaví concentra industrias contaminantes y ha tenido episodios graves de intoxicación masiva, especialmente en escolares (2018)."
+  },
+  {
+    pregunta: "Según la OMS (1948), la salud es:",
+    opciones: [
+      "La ausencia de enfermedades físicas",
+      "Un estado de completo bienestar físico, mental y social",
+      "El acceso a servicios médicos de calidad",
+      "Vivir más de 80 años",
+      "Tener buena condición física"
+    ],
+    correcta: 1,
+    explicacion: "La OMS definió la salud en 1948 como bienestar físico, mental y social, no solamente la ausencia de enfermedad."
+  },
+  {
+    pregunta: "¿Cuál de los siguientes NO es un determinante de la salud según el modelo de Lalonde?",
+    opciones: [
+      "Biológicos (genética)",
+      "Ambientales",
+      "Estilos de vida",
+      "Religión personal",
+      "Sistema sanitario"
+    ],
+    correcta: 3,
+    explicacion: "Los 4 determinantes de Lalonde son: biológicos, ambientales, estilos de vida y sistema sanitario. La religión no está incluida."
+  },
+  {
+    pregunta: "El determinante con mayor influencia modificable sobre la salud, según la OMS, es:",
+    opciones: [
+      "La genética",
+      "Los estilos de vida",
+      "El sistema sanitario",
+      "El clima",
+      "La edad"
+    ],
+    correcta: 1,
+    explicacion: "Los estilos de vida (alimentación, ejercicio, consumo de drogas, etc.) son el factor más modificable y de mayor impacto."
+  },
+  {
+    pregunta: "Las 3 fases del Síndrome General de Adaptación (Selye), en orden, son:",
+    opciones: [
+      "Alarma → Agotamiento → Resistencia",
+      "Resistencia → Alarma → Agotamiento",
+      "Alarma → Resistencia → Agotamiento",
+      "Agotamiento → Resistencia → Alarma",
+      "Alarma → Resistencia → Recuperación"
+    ],
+    correcta: 2,
+    explicacion: "El orden correcto es: Alarma (adrenalina) → Resistencia (cortisol) → Agotamiento (caída de defensas)."
+  },
+  {
+    pregunta: "La hormona principal de la fase de RESISTENCIA del estrés es:",
+    opciones: [
+      "Adrenalina",
+      "Insulina",
+      "Cortisol",
+      "Melatonina",
+      "Serotonina"
+    ],
+    correcta: 2,
+    explicacion: "El cortisol (corteza suprarrenal) es la hormona clave de la fase de resistencia. La adrenalina corresponde a la fase de alarma."
+  },
+  {
+    pregunta: "Prepararse con motivación para una prueba importante es un ejemplo de:",
+    opciones: [
+      "Distrés",
+      "Eustrés",
+      "Estrés crónico",
+      "Agotamiento",
+      "Ansiedad patológica"
+    ],
+    correcta: 1,
+    explicacion: "El eustrés es el estrés positivo que motiva y mejora el rendimiento. El distrés es el estrés negativo que daña la salud."
+  },
+  {
+    pregunta: "¿En qué fase del sueño ocurren los sueños más vívidos y los movimientos oculares rápidos?",
+    opciones: [
+      "Fase N1",
+      "Fase N2",
+      "Fase N3 (sueño profundo)",
+      "Fase REM",
+      "Fase de vigilia"
+    ],
+    correcta: 3,
+    explicacion: "La fase REM (Movimientos Oculares Rápidos) es donde ocurren los sueños vívidos y la actividad cerebral se parece a la vigilia."
+  },
+  {
+    pregunta: "La fase del sueño donde el cuerpo realmente descansa y se libera hormona de crecimiento es:",
+    opciones: [
+      "Fase N1",
+      "Fase N2",
+      "Fase N3 (sueño profundo de ondas lentas)",
+      "Fase REM",
+      "Vigilia"
+    ],
+    correcta: 2,
+    explicacion: "La fase N3 o sueño de ondas lentas es la del descanso físico real, liberación de GH y consolidación de memoria."
+  },
+  {
+    pregunta: "La apnea del sueño se caracteriza por:",
+    opciones: [
+      "Ataques súbitos de sueño durante el día",
+      "Pausas respiratorias durante el sueño",
+      "Caminar dormido",
+      "Pesadillas frecuentes",
+      "Dificultad para conciliar el sueño"
+    ],
+    correcta: 1,
+    explicacion: "La apnea del sueño son pausas en la respiración mientras se duerme, causando fatiga diurna. La narcolepsia es la de ataques de sueño."
+  },
+  {
+    pregunta: "¿Cuál de los siguientes NO es una función del sueño?",
+    opciones: [
+      "Consolidar la memoria",
+      "Regular hormonas (GH, leptina, grelina)",
+      "Aumentar la masa muscular sin ejercicio",
+      "Fortalecer el sistema inmune",
+      "Eliminar desechos metabólicos del cerebro"
+    ],
+    correcta: 2,
+    explicacion: "El sueño NO aumenta masa muscular sin ejercicio; ayuda a recuperar, pero el crecimiento muscular requiere entrenamiento."
+  },
+  {
+    pregunta: "La salud mental, según la OMS, implica:",
+    opciones: [
+      "No tener ningún trastorno psiquiátrico",
+      "Bienestar emocional, capacidad de afrontar tensiones y de aportar a la comunidad",
+      "Ser siempre feliz y optimista",
+      "No experimentar tristeza nunca",
+      "Tener un coeficiente intelectual alto"
+    ],
+    correcta: 1,
+    explicacion: "Salud mental no es solo ausencia de trastornos: es bienestar, capacidad de afrontar, trabajar productivamente y aportar socialmente."
+  },
+  {
+    pregunta: "El modelo que explica los trastornos mentales considerando factores biológicos, psicológicos y sociales se llama:",
+    opciones: [
+      "Modelo biomédico",
+      "Modelo conductual",
+      "Modelo biopsicosocial",
+      "Modelo cognitivo",
+      "Modelo psicoanalítico"
+    ],
+    correcta: 2,
+    explicacion: "El modelo biopsicosocial integra los tres tipos de causas (biológicas, psicológicas y sociales) para explicar la salud mental."
+  },
+  {
+    pregunta: "El trastorno caracterizado por alucinaciones, delirios y pensamiento desorganizado es:",
+    opciones: [
+      "Depresión mayor",
+      "Trastorno obsesivo-compulsivo",
+      "Esquizofrenia",
+      "Trastorno bipolar",
+      "Anorexia nerviosa"
+    ],
+    correcta: 2,
+    explicacion: "La esquizofrenia se caracteriza por pérdida de contacto con la realidad: alucinaciones, delirios y desorganización del pensamiento."
+  },
+  {
+    pregunta: "Según su efecto en el SNC, la cocaína se clasifica como droga:",
+    opciones: [
+      "Depresora",
+      "Estimulante",
+      "Alucinógena",
+      "Inhalante",
+      "Opiácea"
+    ],
+    correcta: 1,
+    explicacion: "La cocaína es estimulante: acelera el SNC, aumenta energía, atención y frecuencia cardíaca. Junto a anfetaminas, cafeína y nicotina."
+  },
+  {
+    pregunta: "El neurotransmisor principal del sistema de recompensa cerebral (vía mesolímbica) es:",
+    opciones: [
+      "Serotonina",
+      "Acetilcolina",
+      "GABA",
+      "Dopamina",
+      "Adrenalina"
+    ],
+    correcta: 3,
+    explicacion: "La dopamina es el neurotransmisor protagonista del sistema mesolímbico (ATV → Núcleo Accumbens → corteza prefrontal)."
+  },
+  {
+    pregunta: "El conjunto de síntomas físicos y psicológicos que aparecen al dejar de consumir una droga se llama:",
+    opciones: [
+      "Tolerancia",
+      "Dependencia",
+      "Síndrome de abstinencia",
+      "Sobredosis",
+      "Adicción cruzada"
+    ],
+    correcta: 2,
+    explicacion: "El síndrome de abstinencia son los síntomas al dejar de consumir (ansiedad, temblores, insomnio, dolor). Tolerancia = necesitar más dosis."
+  }
+];
+
+// ============ ESTADO ============
+let preguntaActual = 0;
+let respuestas = new Array(preguntas.length).fill(null);
+let nombreUsuario = "";
+
+// ============ PANTALLAS ============
+function mostrar(pantalla) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(pantalla).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ============ INICIO ============
+function iniciar() {
+  const nom = document.getElementById('nombre').value.trim();
+  if (!nom) {
+    alert("Por favor escribe tu nombre antes de comenzar 🙂");
+    return;
+  }
+  nombreUsuario = nom;
+  preguntaActual = 0;
+  respuestas.fill(null);
+  mostrar('prueba');
+  renderPregunta();
+}
+
+// ============ RENDER PREGUNTA ============
+function renderPregunta() {
+  const q = preguntas[preguntaActual];
+  document.getElementById('enunciado').textContent = `${preguntaActual + 1}. ${q.pregunta}`;
+  document.getElementById('contador').textContent = `Pregunta ${preguntaActual + 1} de ${preguntas.length}`;
+  document.getElementById('barra').style.width = `${((preguntaActual + 1) / preguntas.length) * 100}%`;
+
+  const cont = document.getElementById('opciones');
+  cont.innerHTML = '';
+  const letras = ['A', 'B', 'C', 'D', 'E'];
+  q.opciones.forEach((op, i) => {
+    const div = document.createElement('div');
+    div.className = 'opcion' + (respuestas[preguntaActual] === i ? ' seleccionada' : '');
+    div.innerHTML = `<div class="letra">${letras[i]}</div><div>${op}</div>`;
+    div.onclick = () => seleccionar(i);
+    cont.appendChild(div);
+  });
+
+  document.getElementById('btn-anterior').style.visibility = preguntaActual === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-siguiente').textContent =
+    preguntaActual === preguntas.length - 1 ? 'Finalizar ✓' : 'Siguiente →';
+}
+
+function seleccionar(i) {
+  respuestas[preguntaActual] = i;
+  renderPregunta();
+}
+
+function siguiente() {
+  if (respuestas[preguntaActual] === null) {
+    if (!confirm("No has respondido esta pregunta. ¿Continuar igual?")) return;
+  }
+  if (preguntaActual === preguntas.length - 1) {
+    finalizar();
+  } else {
+    preguntaActual++;
+    renderPregunta();
+  }
+}
+
+function anterior() {
+  if (preguntaActual > 0) {
+    preguntaActual--;
+    renderPregunta();
+  }
+}
+
+// ============ RESULTADO ============
+function finalizar() {
+  let aciertos = 0;
+  respuestas.forEach((r, i) => { if (r === preguntas[i].correcta) aciertos++; });
+
+  document.getElementById('nombre-resultado').textContent = `Resultado de ${nombreUsuario}`;
+  document.getElementById('puntaje-num').textContent = aciertos;
+
+  // Color del círculo según puntaje
+  const circ = document.getElementById('circulo-puntaje');
+  let color, nivel, mensaje;
+  const pct = (aciertos / preguntas.length) * 100;
+  if (pct >= 85) { color = 'linear-gradient(135deg, #25D366, #128C7E)'; nivel = '🏆 ¡Excelente!'; mensaje = 'Dominas muy bien los contenidos. Estás listo/a para la prueba.'; }
+  else if (pct >= 70) { color = 'linear-gradient(135deg, #2e75b6, #1a4d8f)'; nivel = '👍 ¡Muy bien!'; mensaje = 'Tienes una buena base. Repasa los puntos que fallaste.'; }
+  else if (pct >= 50) { color = 'linear-gradient(135deg, #f39c12, #e67e22)'; nivel = '⚠ Aceptable'; mensaje = 'Vas por buen camino pero necesitas reforzar. Revisa el material.'; }
+  else { color = 'linear-gradient(135deg, #e74c3c, #c0392b)'; nivel = '📚 A estudiar'; mensaje = 'Te falta repasar. Vuelve al apunte y vuelve a intentarlo.'; }
+
+  circ.style.background = color;
+  document.getElementById('nivel-texto').textContent = nivel;
+  document.getElementById('mensaje-resultado').textContent = mensaje;
+
+  // Render revisión
+  const rev = document.getElementById('revision-detalle');
+  rev.innerHTML = '';
+  const letras = ['A', 'B', 'C', 'D', 'E'];
+  preguntas.forEach((q, i) => {
+    const correcto = respuestas[i] === q.correcta;
+    const item = document.createElement('div');
+    item.className = 'item-revision';
+    const tuResp = respuestas[i] === null ? 'Sin responder' : letras[respuestas[i]];
+    item.innerHTML = `
+      <div><span class="num">${i + 1}.</span> ${q.pregunta}</div>
+      <div style="margin-top:6px;">
+        Tu respuesta: <span class="${correcto ? 'correcta' : 'incorrecta'}">${tuResp}</span> ·
+        Correcta: <span class="correcta">${letras[q.correcta]}</span>
+      </div>
+      <div class="explicacion">💡 ${q.explicacion}</div>
+    `;
+    rev.appendChild(item);
+  });
+
+  mostrar('resultado');
+}
+
+function toggleRevision() {
+  document.getElementById('desglose').classList.toggle('visible');
+}
+
+function reiniciar() {
+  document.getElementById('nombre').value = nombreUsuario;
+  document.getElementById('desglose').classList.remove('visible');
+  mostrar('inicio');
+}
+
+// ============ WHATSAPP ============
+function compartirPrueba() {
+  const texto = `📚 ¡Hola! Te paso esta *Prueba Interactiva* para estudiar (Salud, Estrés, Sueño, Salud Mental y Drogas).\n\nSon 20 preguntas y al final ves tu puntaje 📊\n\n👉 Descarga el archivo HTML y ábrelo en tu celular o computador.\n\n¡Suerte! 🍀`;
+  const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+  window.open(url, '_blank');
+}
+
+function compartirResultado() {
+  let aciertos = 0;
+  respuestas.forEach((r, i) => { if (r === preguntas[i].correcta) aciertos++; });
+  const pct = Math.round((aciertos / preguntas.length) * 100);
+  const texto = `📊 *Resultado de la Prueba 02/06*\n\n👤 ${nombreUsuario}\n✅ Puntaje: *${aciertos}/${preguntas.length}* (${pct}%)\n\nTemas: Metabolismo, Contaminación, Salud, Estrés, Sueño, Salud Mental y Drogas.`;
+  const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+  window.open(url, '_blank');
+}
+
+// Permitir enter para iniciar
+document.getElementById('nombre').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') iniciar();
+});
+</script>
+</body>
+</html>
